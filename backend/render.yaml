@@ -1,0 +1,53 @@
+services:
+  # 1. خدمة الـ FastAPI (Web Service)
+  - type: web
+    name: computer-house-api
+    env: docker
+    plan: free  # أو starter إذا كنت تستخدم خطة مدفوعة
+    dockerCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_KEY
+        sync: false
+      - key: SENTRY_DSN
+        sync: false
+      - key: ENVIRONMENT
+        value: production
+      - key: MOCK_INTEGRATIONS
+        value: "False"  # سيتم تفعيل الواتساب و Taager الحقيقي
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: computer-house-redis
+          property: connectionString
+
+  # 2. خدمة الـ Celery (Background Worker)
+  - type: worker
+    name: computer-house-celery
+    env: docker
+    plan: free
+    dockerCommand: celery -A tasks.celery_app worker --loglevel=info
+    envVars:
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_KEY
+        sync: false
+      - key: SENTRY_DSN
+        sync: false
+      - key: ENVIRONMENT
+        value: production
+      - key: MOCK_INTEGRATIONS
+        value: "False"
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: computer-house-redis
+          property: connectionString
+
+  # 3. قاعدة بيانات Redis
+  - type: redis
+    name: computer-house-redis
+    plan: free
+    ipAllowList: [] # مغلق للوصول الخارجي (متاح فقط للـ API والـ Worker)
