@@ -72,5 +72,25 @@ cd computer-house
 # Edit the .env file with your Supabase credentials and WhatsApp API tokens
 nano .env
 
+# Supabase
+SUPABASE_URL=https://your-project-ref.supabase.co
+SUPABASE_KEY=your-supabase-service-role-or-anon-key
+
+# Redis / Celery
+REDIS_URL=redis://redis:6379/0
+CELERY_BROKER_URL=redis://redis:6379/0
+
+# WhatsApp Integration (Mock mode active)
+MOCK_INTEGRATIONS=True
+WHATSAPP_API_URL=https://api.ultramsg.com/instance00000
+WHATSAPP_TOKEN=mock_token_sample
+
+# Observability
+SENTRY_DSN=
+ENVIRONMENT=development
+
+# Frontend
+NEXT_PUBLIC_APP_URL=http://localhost
+
 # 3. Build and Deploy
 docker compose up --build -d
